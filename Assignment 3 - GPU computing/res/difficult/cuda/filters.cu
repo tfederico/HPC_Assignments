@@ -9,7 +9,7 @@ using std::endl;
 using std::fixed;
 using std::setprecision;
 
-const long nrThreads = 1000000;
+const long nrThreads = 100000;
 const int filterHeight = 5;
 const int filterWidth = 5;
 

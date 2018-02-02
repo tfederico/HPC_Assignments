@@ -236,22 +236,26 @@ convolution_kernel took         28.506 ms
 
 \section{Image processing pipeline}
 
-Without shared memory, 1.000.000 threads:
+Without shared memory, 100.000 threads:
 
 \begin{verbatim}
-rgb2gray (kernel):              0.000474 seconds.
-rgb2gray (memory):              0.071913 seconds.
+rgb2gray (kernel):              0.000514 seconds
+rgb2gray (memory):              0.048428 seconds
+rbg2gray (sum):                 0.048942 seconds = 48.942 ms
 
-histogram1D (kernel):           0.000008 seconds.
-histogram1D (memory):           0.017150 seconds.
+histogram (kernel):             0.000007 seconds
+histogram (memory):             0.016377 seconds
+histogram (sum):                0.016314 seconds = 16.314 ms
 
-contrast1D (kernel):            0.000174 seconds.
-contrast1D (memory):            0.016941 seconds.
+contrast (kernel):              0.000176 seconds
+contrast (memory):              0.016377 seconds
+contrast (sum):                 0.016553 seconds = 16.553 ms
 
-triangularSmooth (kernel):      0.000395 seconds.
-triangularSmooth (memory):      0.017134 seconds.
+triangularSmooth (kernel):      0.000176 seconds
+triangularSmooth (memory):      0.016312 seconds
+triangularSmooth (sum):         0.016488 seconds = 16.488 ms
 
-Execution time:                 0.217993 seconds. 		
+Execution time:                 0.183148 seconds = 183.148 ms 		
 \end{verbatim}
 
 \end{document}

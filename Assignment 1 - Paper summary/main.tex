@@ -1,4 +1,4 @@
-\documentclass[a4paper]{article}
+\documentclass[a4paper]{IEEEtran}
 
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
@@ -6,7 +6,7 @@
 \usepackage{graphicx}
 \usepackage[colorinlistoftodos]{todonotes}
 
-\title{High Performance Computing and Big Data - Paper summary}
+\title{High Performance Computing and Big Data \\ Assignment 1}
 
 \author{Federico Tavella, Student number 11343605}
 
@@ -15,6 +15,45 @@
 \begin{document}
 \maketitle
 
-\section{•}
+\section{Cloud computing and Grid Computing 360-Degree Compared}
+
+Lately, cloud computing and grid computing have been used as synonyms to indicate a technology that enable its user to obtain computational power without the cost of owning the physical devices. However, in Foster et al.~\cite{CloudGrid} the authors underlined how, despite the various shared characteristics (e.g. reduction of cost of computing and increment of reliability and flexibility) and purposes, cloud and grid computing are different under many other aspects. Here we summarise the most important point described in the paper. 
+
+\subsection{Summary}
+
+Firstly, clouds and grids differ for their \textbf{business model:} in a business model based on cloud, a customer pays the provider based on the resources (e.g., gigabytes or computational power) he/she is consuming. On the other hand, a grid-based business model is project oriented, in which the users - represented by a proposal (i.e., a project with the associated needed resources) - have a certain amount of service units that they can spend.
+
+Secondly, they have different \textbf{architectures:} grids foucus on integrating existing resources with their HW, operative systems, local management and security infrastructure. In fact, grids have a special attention for interoperability and security issues since resources come from different domains. Cloud instead has been developed to address Internet-scale computing problem, so they are seen as pool of resources that can be accessed through standard protocols. Moreover, clouds generally provide services at three different levels, namely \textit{IaaS}, \textit{SaaS} and \textit{PaaS}.
+In addition to this, there are some common flaws in \textbf{resource management:} in this case, both clouds and grids are facing challenges in the way the compute (e.g., scheduling, virtualization) and store (e.g., data locality, provenance, etc) data.
+
+Foster et al. also provided some room for the two \textbf{programming model:} in grid computing, the primary target is large-scale scientific computations and thus, users are highly interested in programming languages that can scale to leverage a large amount of resources. On the contrary, due to the lack of integrability of different services, in the cloud world users take advantage of Web Services APIs.
+
+Moreover, there are some differences in their \textbf{application model:} grids supports many kind of application, like high performance computing (HPC) and high throughtput computing (HTC). On the other hand, clouds are not expected to achieve the same efficiency as grinds in HPC because that would require fast and low latency interconnects for efficient scaling to many processors.
+
+Finally, the authors discussed the \textbf{security models:} in grids, there is the assumption that resources are heterogeneous and dunamic, and each site may have its own amministrator; thus, security is part of the design of the own grid, addressing issues such as delegation, privacy, integrity, segregation, resource allocation, etc. On the contrary, clouds have a simpler and less secure approach to security. For example, a new user can access any time to a cloud resource providing some data, while for the grids there are several stricter policies for enrollment.
+
+\subsection{Discussion}
+
+???
+
+\section{The Pathologies of Big Data}
+
+\subsection{Summary}
+
+???
+
+\subsection{Discussion}
+
+???
+
+\begin{thebibliography}{1}
+
+\bibitem{CloudGrid}
+Foster  et  al.  "Cloud  Computing  and  Grid  Computing  360-Degree  Compared," Grid Computing Environments Workshop, 2008. GCE '08, vol., no., pp.1,10, 12-16 Nov. 2008, doi:10.1109/GCE.2008.4738445
+
+\bibitem{BigData}
+Adam  Jacobs  “The  pathologies  of  big  data”,  Magazine Communications  of  the ACM ,Vol. 52 Issue 8, Aug. 2009. doi:10.1145/1536616.1536632
+
+\end{thebibliography}
 
 \end{document}

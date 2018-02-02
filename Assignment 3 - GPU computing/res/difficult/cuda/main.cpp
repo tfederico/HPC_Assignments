@@ -15,7 +15,7 @@ using std::setprecision;
 
 // Constants
 const bool displayImages = false;
-const bool saveAllImages = true;
+const bool saveAllImages = false;
 const unsigned int HISTOGRAM_SIZE = 256;
 const unsigned int BAR_WIDTH = 4;
 const unsigned int CONTRAST_THRESHOLD = 80;
@@ -65,9 +65,6 @@ int main(int argc, char *argv[]) {
 	CImg< unsigned char > histogramImage = CImg< unsigned char >(BAR_WIDTH * HISTOGRAM_SIZE, HISTOGRAM_SIZE, 1, 1);
 	unsigned int *histogram = new unsigned int [HISTOGRAM_SIZE];
 
-	/*for(int i = 0; i < HISTOGRAM_SIZE; i++){
-		histogram[i] = 0;
-	}*/
 	histogram1D(grayImage.data(), histogramImage.data(), grayImage.width(), grayImage.height(), histogram, HISTOGRAM_SIZE, BAR_WIDTH, total);
 	total.stop();
 	if ( displayImages ) {
@@ -100,7 +97,9 @@ int main(int argc, char *argv[]) {
 	if ( displayImages ) {
 		smoothImage.display("Smooth Image");
 	}
+
 	smoothImage.save("./smooth.bmp");
+
 
 	// Wrap up
 	cout << fixed << setprecision(6) << endl;
