@@ -15,15 +15,13 @@
 \begin{document}
 \maketitle
 
-\begin{abstract}
-Please submit the code you have modified (full folders, all in one archive) AND a report documenting your work. Please focus, in your report, on three aspects: the design of your parallel application (that is, how did you think to parallelize it, what does each thread do, any choices you made and why, etc), the implementation (explain the challenges  you encountered, if any), and the analysis of your performance results (present the data and try to reflect on what the performance data means). A reflection on GPU programming using CUDA is also recommended as a conclusion/discussion point. 
-\end{abstract}
-
 \section{Vector - Performance comparision}
 
 \subsection{Exercise 1}
 
-We can see how for small vectors, the sequential algorithm is faster than the parallel one. However, as long as the size of the array increases, the kernel time increases much slower than the time of the sequential one.
+In this exercise, each thread compute one single operation (i.e., sum, subtraction, multiplication or division). The size of the block has 512 threads and thus, the number of block is $N/512$, where $N$ is the length of the two arrays.  
+
+We can see how for small vectors, the sequential algorithm is much faster than the parallel one. However, as long as the size of the array increases, the kernel time increases in a slower way than the time of the sequential one.
 
 \begin{verbatim}
 Array size 256
@@ -31,61 +29,71 @@ Adding two vectors of 256 integer elements.
 vector-add (sequential):        = 2.28333e-07 seconds
 vector-add (kernel):            = 3.77233e-05 seconds
 vector-add (memory):            = 4.95267e-05 seconds
-
+\end{verbatim}
+\begin{verbatim}
 Array size 1024
 Adding two vectors of 1024 integer elements.
 vector-add (sequential):        = 9.11667e-07 seconds
 vector-add (kernel):            = 3.90333e-05 seconds
 vector-add (memory):            = 5.56933e-05 seconds
-
+\end{verbatim}
+\begin{verbatim}
 Array size 65536
 Adding two vectors of 65536 integer elements.
 vector-add (sequential):        = 0.000124367 seconds
 vector-add (kernel):            = 5.5335e-05 seconds
 vector-add (memory):            = 0.000543362 seconds
-
+\end{verbatim}
+\begin{verbatim}
 Array size 100000
 Adding two vectors of 100000 integer elements.
 vector-add (sequential):        = 0.000193135 seconds
 vector-add (kernel):            = 8.25017e-05 seconds
 vector-add (memory):            = 0.000794402 seconds
-
+\end{verbatim}
+\begin{verbatim}
 Array size 1000000
 Adding two vectors of 1000000 integer elements.
-vector-add (sequential): 		  = 0.00198124 seconds
-vector-add (kernel): 		  = 0.000227047 seconds
-vector-add (memory): 		  = 0.00556791 seconds
+vector-add (sequential): 	      = 0.00198124 seconds
+vector-add (kernel): 	          = 0.000227047 seconds
+vector-add (memory): 	          = 0.00556791 seconds
 \end{verbatim}
 
 \subsection{Exercise 1.1 - Vector-add-events}
 
-???
+Events are used as an alternative to CPU timers to avoid stalling the GPU pipeline.\footnote{https://devblogs.nvidia.com/how-implement-performance-metrics-cuda-cc/}
+
+We can see that the kernel invocation is generally faster using events instead of \texttt{cudaDeviceSynchronize()}, expecially for bigger arrays. However, the overall time to complete the task has increased.
 
 \begin{verbatim}
 Array size 256
 kernel invocation took 0.035008 milliseconds
-vector-add (sequential): 		  =  0.064984 seconds
-
+vector-add: 		  =  0.064984 seconds
+\end{verbatim}
+\begin{verbatim}
 Array size 1024
 kernel invocation took 0.03824 milliseconds
-vector-add (sequential): 		  = 0.0650716 seconds
-
+vector-add: 		  = 0.0650716 seconds
+\end{verbatim}
+\begin{verbatim}
 Array size 65536
 kernel invocation took 0.008352 milliseconds
-vector-add (sequential): 		  = 0.0638557 seconds
-
+vector-add: 		  = 0.0638557 seconds
+\end{verbatim}
+\begin{verbatim}
 Array size 100000
 kernel invocation took 0.012448 milliseconds
-vector-add (sequential): 		  = 0.0645166 seconds
-
+vector-add: 		  = 0.0645166 seconds
+\end{verbatim}
+\begin{verbatim}
 Array size 1000000
 kernel invocation took 0.081984 milliseconds
-vector-add (sequential): 		  = 0.0694935 seconds
+vector-add: 		  = 0.0694935 seconds
 \end{verbatim}
 
 \subsection{Exercise 2 - Vector-transform}
 
-Even in this case, the sequential algorithm is faster for smaller array than the parallel one. Despite that, for bigger arrays, the parallel computation overcome the sequential one.
+Even in this case, the sequential algorithm is faster than the parallel one for small arrays. Despite that, for huge arrays, the parallel computation overcome the sequential one.
 
 \begin{verbatim}
 Array size 256
@@ -93,25 +101,29 @@ Iteratively transform vector A with vector B of 256 integer elements.
 vector-add (sequential):        = 1.44667e-06 seconds
 vector-add (kernel):            = 4.69233e-05 seconds
 vector-add (memory):            = 7.35333e-05 seconds
-
+\end{verbatim}
+\begin{verbatim}
 Array size 1024
 Iteratively transform vector A with vector B of 1024 integer elements.
 vector-add (sequential):        = 5.61333e-06 seconds
 vector-add (kernel):            = 3.681e-05 seconds
 vector-add (memory):            = 5.622e-05 seconds
-
+\end{verbatim}
+\begin{verbatim}
 Array size 65536
 Iteratively transform vector A with vector B of 65536 integer elements.
 vector-add (sequential):        = 0.000348023 seconds
 vector-add (kernel):            = 5.60533e-05 seconds
 vector-add (memory):            = 0.000470318 seconds
-
+\end{verbatim}
+\begin{verbatim}
 Array size 100000
 Iteratively transform vector A with vector B of 100000 integer elements.
 vector-add (sequential):        = 0.000534875 seconds
 vector-add (kernel):            = 8.33167e-05 seconds
 vector-add (memory):            = 0.00092603 seconds
-
+\end{verbatim}
+\begin{verbatim}
 Array size 1000000
 Iteratively transform vector A with vector B of 1000000 integer elements.
 vector-add (sequential):        = 0.00592521 seconds
@@ -124,7 +136,7 @@ vector-add (memory):            = 0.00470085 seconds
 
 \subsection{Exercise 3 - Single code Ceasar's code}
 
-For a small text file (1902 characters), the sequential encryption is 6 times faster than the parallel one and the decryption is 3 times faster. However, if we increase the size of the file up to 3117782 characters, we can see how the parallel encryption and decryption are 3-4 times faster than the sequential ones.
+For a small text file (1902 characters), the sequential encryption is 6 times faster than the parallel one and the decryption is 3 times faster. However, if we increase the size of the file up to ~3 million characters, we can see how the parallel encryption and decryption are 3-4 times faster than the sequential ones.
 
 \begin{verbatim}
 File size 1902 characters
@@ -134,7 +146,8 @@ Encrypt (memory):           0.000039 seconds.
 Decryption (sequential):    0.000007 seconds.
 Decrypt (kernel):           0.000015 seconds.
 Decrypt (memory):           0.000023 seconds.
-
+\end{verbatim}
+\begin{verbatim}
 File size 4986 characters
 Encryption (sequential):    0.000013 seconds.
 Encrypt (kernel):           0.000039 seconds.
@@ -142,7 +155,8 @@ Encrypt (memory):           0.000046 seconds.
 Decryption (sequential):    0.000013 seconds.
 Decrypt (kernel):           0.000022 seconds.
 Decrypt (memory):           0.000030 seconds.
-
+\end{verbatim}
+\begin{verbatim}
 File size 19486 characters
 Encryption (sequential):    0.000039 seconds.
 Encrypt (kernel):           0.000037 seconds.
@@ -150,7 +164,8 @@ Encrypt (memory):           0.000060 seconds.
 Decryption (sequential):    0.000056 seconds.
 Decrypt (kernel):           0.000022 seconds.
 Decrypt (memory):           0.000045 seconds.
-
+\end{verbatim}
+\begin{verbatim}
 File size 155890 characters
 Encryption (sequential):    0.000326 seconds.
 Encrypt (kernel):           0.000054 seconds.
@@ -158,7 +173,8 @@ Encrypt (memory):           0.000194 seconds.
 Decryption (sequential):    0.000291 seconds.
 Decrypt (kernel):           0.000040 seconds.
 Decrypt (memory):           0.000117 seconds.
-
+\end{verbatim}
+\begin{verbatim}
 File size 3117782 characters
 Encryption (sequential):    0.006650 seconds.
 Encrypt (kernel):           0.000296 seconds.
@@ -170,7 +186,7 @@ Decrypt (memory):           0.001581 seconds.
 
 \subsection{Exercise 4 - Double key Caesar's code}
 
-The performance are almost the same for the single key Caesar's code.
+The performance are almost the same of the single key Caesar's code.
 
 \begin{verbatim}
 File size 1902 characters
@@ -180,7 +196,8 @@ Encrypt (memory):           0.000042 seconds.
 Decryption (sequential):    0.000004 seconds.
 Decrypt (kernel):           0.000022 seconds.
 Decrypt (memory):           0.000027 seconds.
-
+\end{verbatim}
+\begin{verbatim}
 File size 4986 characters
 Encryption (sequential):    0.000011 seconds.
 Encrypt (kernel):           0.000031 seconds.
@@ -188,7 +205,8 @@ Encrypt (memory):           0.000039 seconds.
 Decryption (sequential):    0.000011 seconds.
 Decrypt (kernel):           0.000015 seconds.
 Decrypt (memory):           0.000025 seconds.
-
+\end{verbatim}
+\begin{verbatim}
 File size 19486 characters
 Encryption (sequential):    0.000047 seconds.
 Encrypt (kernel):           0.000038 seconds.
@@ -196,7 +214,8 @@ Encrypt (memory):           0.000065 seconds.
 Decryption (sequential):    0.000042 seconds.
 Decrypt (kernel):           0.000022 seconds.
 Decrypt (memory):           0.000039 seconds.
-
+\end{verbatim}
+\begin{verbatim}
 File size 155890 characters
 Encryption (sequential):    0.000385 seconds.
 Encrypt (kernel):           0.000042 seconds.
@@ -204,7 +223,8 @@ Encrypt (memory):           0.000195 seconds.
 Decryption (sequential):    0.000363 seconds.
 Decrypt (kernel):           0.000040 seconds.
 Decrypt (memory):           0.000121 seconds.
-
+\end{verbatim}
+\begin{verbatim}
 File size 3117782 characters
 Encryption (sequential):    0.007789 seconds.
 Encrypt (kernel):           0.000296 seconds.
@@ -224,11 +244,15 @@ convolve took                   382.897 ms
 
 \subsection{Exercise 4a}
 
+The naive implementation is faster than the sequential version.
+
 \begin{verbatim}
 convolution_kernel_naive took   6.246 ms
 \end{verbatim}
 
 \subsection{Exercise 4b}
+
+On the other hand, the implementation that takes advantage of the shared memory is slower than the naive one, but still faster than the sequental convolution. We suppose that this overhead is caused by copying part of the matrix in the shared memory of each block.
 
 \begin{verbatim}
 convolution_kernel took         28.506 ms
@@ -236,26 +260,50 @@ convolution_kernel took         28.506 ms
 
 \section{Image processing pipeline}
 
-Without shared memory, 100.000 threads:
+Here we report the benchmark for the image processing pipeline, executed on the file \texttt{images/image09.bmp}, which is the biggest in the dataset.
+
+
+\noindent Sequential version:
+
+\begin{verbatim}
+rgb2gray (kernel):             0.434587 seconds
+histogram1D (kernel):          0.121998 seconds
+contrast1D (kernel):           0.454838 seconds
+triangularSmooth (kernel):     6.334913 seconds
+
+Execution time:                7.347049 seconds
+\end{verbatim}
+
+\noindent Parallel version, 100.000 threads:
 
 \begin{verbatim}
 rgb2gray (kernel):              0.000514 seconds
 rgb2gray (memory):              0.048428 seconds
 rbg2gray (sum):                 0.048942 seconds = 48.942 ms
-
+\end{verbatim}
+\begin{verbatim}
 histogram (kernel):             0.000007 seconds
 histogram (memory):             0.016377 seconds
 histogram (sum):                0.016314 seconds = 16.314 ms
-
+\end{verbatim}
+\begin{verbatim}
 contrast (kernel):              0.000176 seconds
 contrast (memory):              0.016377 seconds
 contrast (sum):                 0.016553 seconds = 16.553 ms
-
+\end{verbatim}
+\begin{verbatim}
 triangularSmooth (kernel):      0.000176 seconds
 triangularSmooth (memory):      0.016312 seconds
 triangularSmooth (sum):         0.016488 seconds = 16.488 ms
-
+\end{verbatim}
+\begin{verbatim}
 Execution time:                 0.183148 seconds = 183.148 ms 		
 \end{verbatim}
+
+The parallel version is almost 100 times faster than the sequential one. In order to increase the parallel pipeline performance, some improvements could be the usage of shared memory and events/streams.
+
+\section{Conclusion}
+
+In conclusion, we have seen through different examples how the usage of GPUs - and thus CUDA - can decrease in some cases of two orders of magnitude the time required to complete a task. However, the usage of GPU computing is not recommended when dealing with small tasks or datasets because it would not influece positively the overhall performance, due to the overhead caused by the parallelization. We think that one of the main advantages of CUDA is the fact that, if one is already familiar with most of the concepts of parallel programming, it is quite easy to convert a sequential algorithm to a parallel one without chaning most of the code.
 
 \end{document}

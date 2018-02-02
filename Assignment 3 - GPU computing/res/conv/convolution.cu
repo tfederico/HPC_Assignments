@@ -252,4 +252,3 @@ int compare_arrays(float *a1, float *a2, int n) {
 
     return errors;
 }
-
