@@ -8,190 +8,250 @@
 
 \title{High Performance Computing and Big Data - GPU programming}
 
-\author{Federico Tavella}
+\author{Federico Tavella, Student number 11343605}
 
 \date{\today}
 
 \begin{document}
 \maketitle
 
+\begin{abstract}
+Please submit the code you have modified (full folders, all in one archive) AND a report documenting your work. Please focus, in your report, on three aspects: the design of your parallel application (that is, how did you think to parallelize it, what does each thread do, any choices you made and why, etc), the implementation (explain the challenges  you encountered, if any), and the analysis of your performance results (present the data and try to reflect on what the performance data means). A reflection on GPU programming using CUDA is also recommended as a conclusion/discussion point. 
+\end{abstract}
+
 \section{Vector - Performance comparision}
 
-\subsection{Vector-add}
+\subsection{Exercise 1}
+
+We can see how for small vectors, the sequential algorithm is faster than the parallel one. However, as long as the size of the array increases, the kernel time increases much slower than the time of the sequential one.
 
 \begin{verbatim}
 Array size 256
 Adding two vectors of 256 integer elements.
-vector-add (sequential): 		= 2.28333e-07 seconds
-vector-add (kernel): 		  	= 3.77233e-05 seconds
-vector-add (memory): 		  	= 4.95267e-05 seconds
+vector-add (sequential):        = 2.28333e-07 seconds
+vector-add (kernel):            = 3.77233e-05 seconds
+vector-add (memory):            = 4.95267e-05 seconds
 
 Array size 1024
 Adding two vectors of 1024 integer elements.
-vector-add (sequential): 		= 9.11667e-07 seconds
-vector-add (kernel): 		  	= 3.90333e-05 seconds
-vector-add (memory): 		  	= 5.56933e-05 seconds
+vector-add (sequential):        = 9.11667e-07 seconds
+vector-add (kernel):            = 3.90333e-05 seconds
+vector-add (memory):            = 5.56933e-05 seconds
 
 Array size 65536
 Adding two vectors of 65536 integer elements.
-vector-add (sequential): 	 	= 0.000124367 seconds
-vector-add (kernel): 		  	= 5.5335e-05 seconds
-vector-add (memory): 		  	= 0.000543362 seconds
+vector-add (sequential):        = 0.000124367 seconds
+vector-add (kernel):            = 5.5335e-05 seconds
+vector-add (memory):            = 0.000543362 seconds
 
 Array size 100000
 Adding two vectors of 100000 integer elements.
-vector-add (sequential): 		= 0.000193135 seconds
-vector-add (kernel): 		  	= 8.25017e-05 seconds
-vector-add (memory): 		    = 0.000794402 seconds
+vector-add (sequential):        = 0.000193135 seconds
+vector-add (kernel):            = 8.25017e-05 seconds
+vector-add (memory):            = 0.000794402 seconds
 
 Array size 1000000
 Adding two vectors of 1000000 integer elements.
-vector-add (sequential): 		= 0.0019103 seconds
-vector-add (kernel): 		  	= 0.000227423 seconds
-vector-add (memory): 		  	= 0.00728701 seconds
+vector-add (sequential): 		  = 0.00198124 seconds
+vector-add (kernel): 		  = 0.000227047 seconds
+vector-add (memory): 		  = 0.00556791 seconds
 \end{verbatim}
 
-\subsection{Vector-add-events}
+\subsection{Exercise 1.1 - Vector-add-events}
 
 ???
 
-\subsection{Vector-transform}
+\begin{verbatim}
+Array size 256
+kernel invocation took 0.035008 milliseconds
+vector-add (sequential): 		  =  0.064984 seconds
+
+Array size 1024
+kernel invocation took 0.03824 milliseconds
+vector-add (sequential): 		  = 0.0650716 seconds
+
+Array size 65536
+kernel invocation took 0.008352 milliseconds
+vector-add (sequential): 		  = 0.0638557 seconds
+
+Array size 100000
+kernel invocation took 0.012448 milliseconds
+vector-add (sequential): 		  = 0.0645166 seconds
+
+Array size 1000000
+kernel invocation took 0.081984 milliseconds
+vector-add (sequential): 		  = 0.0694935 seconds
+\end{verbatim}
+
+\subsection{Exercise 2 - Vector-transform}
+
+Even in this case, the sequential algorithm is faster for smaller array than the parallel one. Despite that, for bigger arrays, the parallel computation overcome the sequential one.
 
 \begin{verbatim}
 Array size 256
 Iteratively transform vector A with vector B of 256 integer elements.
-vector-add (sequential): 		= 1.44667e-06 seconds
-vector-add (kernel): 		  	= 4.69233e-05 seconds
-vector-add (memory): 		  	= 7.35333e-05 seconds
-
+vector-add (sequential):        = 1.44667e-06 seconds
+vector-add (kernel):            = 4.69233e-05 seconds
+vector-add (memory):            = 7.35333e-05 seconds
 
 Array size 1024
 Iteratively transform vector A with vector B of 1024 integer elements.
-vector-add (sequential): 		= 5.61333e-06 seconds
-vector-add (kernel): 		  	= 3.681e-05 seconds
-vector-add (memory): 		  	= 5.622e-05 seconds
+vector-add (sequential):        = 5.61333e-06 seconds
+vector-add (kernel):            = 3.681e-05 seconds
+vector-add (memory):            = 5.622e-05 seconds
 
 Array size 65536
 Iteratively transform vector A with vector B of 65536 integer elements.
-vector-add (sequential): 		= 0.000348023 seconds
-vector-add (kernel): 		  	= 5.60533e-05 seconds
-vector-add (memory): 		    = 0.000470318 seconds
+vector-add (sequential):        = 0.000348023 seconds
+vector-add (kernel):            = 5.60533e-05 seconds
+vector-add (memory):            = 0.000470318 seconds
 
 Array size 100000
 Iteratively transform vector A with vector B of 100000 integer elements.
-vector-add (sequential): 		= 0.000534875 seconds
-vector-add (kernel): 		  	= 8.33167e-05 seconds
-vector-add (memory): 		  	= 0.00092603 seconds
+vector-add (sequential):        = 0.000534875 seconds
+vector-add (kernel):            = 8.33167e-05 seconds
+vector-add (memory):            = 0.00092603 seconds
 
 Array size 1000000
 Iteratively transform vector A with vector B of 1000000 integer elements.
-vector-add (sequential): 		= 0.00592521 seconds
-vector-add (kernel): 		  	= 0.000227147 seconds
-vector-add (memory): 		  	= 0.00470085 seconds
+vector-add (sequential):        = 0.00592521 seconds
+vector-add (kernel):            = 0.000227147 seconds
+vector-add (memory):            = 0.00470085 seconds
 \end{verbatim}
 
-Considerations: ???
-
-\subsection{Vector-add-streams}
-
-???
 
 \section{Cryptography}
 
-\subsection{Single code Ceasar's code}
+\subsection{Exercise 3 - Single code Ceasar's code}
+
+For a small text file (1902 characters), the sequential encryption is 6 times faster than the parallel one and the decryption is 3 times faster. However, if we increase the size of the file up to 3117782 characters, we can see how the parallel encryption and decryption are 3-4 times faster than the sequential ones.
 
 \begin{verbatim}
-File size 1902
-Encryption (sequential): 	0.000005 seconds.
-Encrypt (kernel): 			0.000034 seconds.
-Encrypt (memory): 			0.000039 seconds.
-Decryption (sequential): 	0.000007 seconds.
-Decrypt (kernel): 			0.000015 seconds.
-Decrypt (memory): 			0.000023 seconds.
+File size 1902 characters
+Encryption (sequential):    0.000005 seconds.
+Encrypt (kernel):           0.000034 seconds.
+Encrypt (memory):           0.000039 seconds.
+Decryption (sequential):    0.000007 seconds.
+Decrypt (kernel):           0.000015 seconds.
+Decrypt (memory):           0.000023 seconds.
 
-File size 4986 chars
-Encryption (sequential): 	0.000013 seconds.
-Encrypt (kernel): 			0.000039 seconds.
-Encrypt (memory): 			0.000046 seconds.
-Decryption (sequential): 	0.000013 seconds.
-Decrypt (kernel): 			0.000022 seconds.
-Decrypt (memory): 			0.000030 seconds.
+File size 4986 characters
+Encryption (sequential):    0.000013 seconds.
+Encrypt (kernel):           0.000039 seconds.
+Encrypt (memory):           0.000046 seconds.
+Decryption (sequential):    0.000013 seconds.
+Decrypt (kernel):           0.000022 seconds.
+Decrypt (memory):           0.000030 seconds.
 
-File size 19486
-Encryption (sequential): 	0.000039 seconds.
-Encrypt (kernel): 			0.000037 seconds.
-Encrypt (memory): 			0.000060 seconds.
-Decryption (sequential): 	0.000056 seconds.
-Decrypt (kernel): 			0.000022 seconds.
-Decrypt (memory): 			0.000045 seconds.
+File size 19486 characters
+Encryption (sequential):    0.000039 seconds.
+Encrypt (kernel):           0.000037 seconds.
+Encrypt (memory):           0.000060 seconds.
+Decryption (sequential):    0.000056 seconds.
+Decrypt (kernel):           0.000022 seconds.
+Decrypt (memory):           0.000045 seconds.
 
-File size 155890
-Encryption (sequential): 	0.000326 seconds.
-Encrypt (kernel): 			0.000054 seconds.
-Encrypt (memory): 			0.000194 seconds.
-Decryption (sequential): 	0.000291 seconds.
-Decrypt (kernel): 			0.000040 seconds.
-Decrypt (memory): 			0.000117 seconds.
+File size 155890 characters
+Encryption (sequential):    0.000326 seconds.
+Encrypt (kernel):           0.000054 seconds.
+Encrypt (memory):           0.000194 seconds.
+Decryption (sequential):    0.000291 seconds.
+Decrypt (kernel):           0.000040 seconds.
+Decrypt (memory):           0.000117 seconds.
 
 File size 3117782 characters
-Encryption (sequential): 	0.006650 seconds.
-Encrypt (kernel): 			0.000296 seconds.
-Encrypt (memory): 			0.002625 seconds.
-Decryption (sequential): 	0.005398 seconds.
-Decrypt (kernel): 			0.000296 seconds.
-Decrypt (memory): 			0.001581 seconds.
+Encryption (sequential):    0.006650 seconds.
+Encrypt (kernel):           0.000296 seconds.
+Encrypt (memory):           0.002625 seconds.
+Decryption (sequential):    0.005398 seconds.
+Decrypt (kernel):           0.000296 seconds.
+Decrypt (memory):           0.001581 seconds.
 \end{verbatim}
 
-\subsection{Double key Caesar's code}
+\subsection{Exercise 4 - Double key Caesar's code}
+
+The performance are almost the same for the single key Caesar's code.
 
 \begin{verbatim}
-File size 1902
-Encryption (sequential): 	0.000004 seconds.
-Encrypt (kernel): 			0.000037 seconds.
-Encrypt (memory): 			0.000042 seconds.
-Decryption (sequential): 	0.000004 seconds.
-Decrypt (kernel): 			0.000022 seconds.
-Decrypt (memory): 			0.000027 seconds.
+File size 1902 characters
+Encryption (sequential):    0.000004 seconds.
+Encrypt (kernel):           0.000037 seconds.
+Encrypt (memory):           0.000042 seconds.
+Decryption (sequential):    0.000004 seconds.
+Decrypt (kernel):           0.000022 seconds.
+Decrypt (memory):           0.000027 seconds.
 
-File size 4986 chars
-Encryption (sequential): 	0.000011 seconds.
-Encrypt (kernel): 			0.000031 seconds.
-Encrypt (memory): 			0.000039 seconds.
-Decryption (sequential): 	0.000011 seconds.
-Decrypt (kernel): 			0.000015 seconds.
-Decrypt (memory): 			0.000025 seconds.
+File size 4986 characters
+Encryption (sequential):    0.000011 seconds.
+Encrypt (kernel):           0.000031 seconds.
+Encrypt (memory):           0.000039 seconds.
+Decryption (sequential):    0.000011 seconds.
+Decrypt (kernel):           0.000015 seconds.
+Decrypt (memory):           0.000025 seconds.
 
-File size 19486
-Encryption (sequential): 	0.000047 seconds.
-Encrypt (kernel): 			0.000038 seconds.
-Encrypt (memory): 			0.000065 seconds.
-Decryption (sequential): 	0.000042 seconds.
-Decrypt (kernel): 			0.000022 seconds.
-Decrypt (memory): 			0.000039 seconds.
+File size 19486 characters
+Encryption (sequential):    0.000047 seconds.
+Encrypt (kernel):           0.000038 seconds.
+Encrypt (memory):           0.000065 seconds.
+Decryption (sequential):    0.000042 seconds.
+Decrypt (kernel):           0.000022 seconds.
+Decrypt (memory):           0.000039 seconds.
 
-File size 155890
-Encryption (sequential): 	0.000385 seconds.
-Encrypt (kernel): 			0.000042 seconds.
-Encrypt (memory): 			0.000195 seconds.
-Decryption (sequential): 	0.000363 seconds.
-Decrypt (kernel): 			0.000040 seconds.
-Decrypt (memory): 			0.000121 seconds.
+File size 155890 characters
+Encryption (sequential):    0.000385 seconds.
+Encrypt (kernel):           0.000042 seconds.
+Encrypt (memory):           0.000195 seconds.
+Decryption (sequential):    0.000363 seconds.
+Decrypt (kernel):           0.000040 seconds.
+Decrypt (memory):           0.000121 seconds.
 
 File size 3117782 characters
-Encryption (sequential): 	0.007789 seconds.
-Encrypt (kernel): 			0.000296 seconds.
-Encrypt (memory): 			0.002624 seconds.
-Decryption (sequential): 	0.007031 seconds.
-Decrypt (kernel): 			0.000299 seconds.
-Decrypt (memory): 			0.001581 seconds.
+Encryption (sequential):    0.007789 seconds.
+Encrypt (kernel):           0.000296 seconds.
+Encrypt (memory):           0.002624 seconds.
+Decryption (sequential):    0.007031 seconds.
+Decrypt (kernel):           0.000299 seconds.
+Decrypt (memory):           0.001581 seconds.
 \end{verbatim}
 
 \section{Convolution}
 
+Sequential version:
+
 \begin{verbatim}
-convolve took 					382.897 ms
-convolution_kernel_naive took 	6.246 ms
-convolution_kernel took 		28.506 ms
+convolve took                   382.897 ms
+\end{verbatim}
+
+\subsection{Exercise 4a}
+
+\begin{verbatim}
+convolution_kernel_naive took   6.246 ms
+\end{verbatim}
+
+\subsection{Exercise 4b}
+
+\begin{verbatim}
+convolution_kernel took         28.506 ms
+\end{verbatim}
+
+\section{Image processing pipeline}
+
+Without shared memory, 1.000.000 threads:
+
+\begin{verbatim}
+rgb2gray (kernel):              0.000474 seconds.
+rgb2gray (memory):              0.071913 seconds.
+
+histogram1D (kernel):           0.000008 seconds.
+histogram1D (memory):           0.017150 seconds.
+
+contrast1D (kernel):            0.000174 seconds.
+contrast1D (memory):            0.016941 seconds.
+
+triangularSmooth (kernel):      0.000395 seconds.
+triangularSmooth (memory):      0.017134 seconds.
+
+Execution time:                 0.217993 seconds. 		
 \end{verbatim}
 
 \end{document}

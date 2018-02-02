@@ -1,0 +1,9 @@
+A brief description of what you will find in each directory and/or what you are expected to put in.
+
+- bin: all the executables must be put in this directory.
+- cuda: all the CUDA sources must be put in this directory.
+- images: the set of images to test the application.
+- include: the includes of the used libraries, leave this directory as it is.
+- Makefile.inc: General definitions for make, you should touch this unless this templace directory is in a non-standard place.
+- sequential: the reference implementation, read the code carefully and use the same structure for your code.
+- src: the source code of the used libraries, leave this directory as it is.
