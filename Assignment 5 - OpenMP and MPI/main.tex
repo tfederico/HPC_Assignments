@@ -1,0 +1,117 @@
+\documentclass[a4paper]{article}
+
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{algorithmic}
+\usepackage[ruled]{algorithm2e} % For algorithms
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[margin=1in]{geometry}
+\usepackage{mathtools}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\title{High Performance Computing and Big Data - OpenMP and MPI}
+
+\author{Federico Tavella, Student number 11343605}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Experimenting with OpenMP}
+
+
+\newpage
+
+\section{Collective communication}
+
+In order to implement the collective communication, we can use the \texttt{MPI\_Send} and \texttt{MPI\_Recv} methods, First of all, we need to retrieve the communication \texttt{rank} and \texttt{size} (i.e., current process id and number of process respectively). To do so, we use the \texttt{MPI\_Comm\_rank} and \texttt{MPI\_Comm\_size} methods. Finally, if the current process is the root one, we broadcast the message to all the other process with the \texttt{MPI\_Send} method; otherwise, the current process is one of the receivers, so we start to listen awating for a message from the root process. The \texttt{tag} variable is used to filter messages from different process.
+
+\begin{verbatim}
+int MPI_Broadcast(  void *buffer,           /* INOUT : buffer address            */
+                    int count,              /* IN    : buffer size               */
+                    MPI_Datatype datatype,  /* IN    : datatype of entry address */
+                    int root,               /* IN    : root process (sender)     */
+                    MPI_Comm communicator)  /* IN    : communicator              */
+{
+  int rank, size, tag;
+  MPI_Status status;
+  MPI_Comm_rank(communicator, rank);
+  MPI_Comm_size(communicator, size);
+
+  //initialise tag variable
+
+  if (rank == root) { // I am the root process
+    for (int i = 0; i < size; i++) {
+      if (i != rank) { //Avoid to send the message to myself
+        MPI_Send(buffer, count, datatype, i, tag, communicator);
+      }
+    }
+  }
+  else { // I am a receiver process
+    MPI_Recv(buffer, count, datatype, root, tag, communicator, &status);
+    /* do something with the data */
+  }
+}
+
+\end{verbatim}
+
+\newpage
+
+\section{Collective communication with topology adaptation}
+
+Topology adaptation improved the performance of the broadcast communication, delegating the re-trasmission of the signal to other nodes. In the case of 1-dimensional ring topology, each node communicates with only two different nodes, one that has a greater MPI rank and one that has a smaller MPI rank than the node itself. Consequently, the root node send the message to its two neighboors, which propagates the message throught the ring without sending it back. In the end, there might be one or two nodes that are the last ones to receive the message, depending on the number of node of the network - i.e., if the number is even, there is one final node; otherwise, there are two.
+
+If we assume $N$ is the number of nodes in the ring, there will be $N-1$ communication events (while without topology adaptation we would have $N$ events). However, since the broadcasting operation is distributed amoung the nodes, the time required to complete the broadcast is much smaller. If we consider as $k$ the time for a single \texttt{MPI\_Send} operation, without topology adaptation we need $kN$ time units to complete the broadcasting, but with this new feature the time is reduced to $k \cdot \floor*{\frac{N}{2}}$.
+
+\begin{verbatim}
+int MPI_Circular_Broadcast(  void *buffer,          /* INOUT : buffer address            */
+                             int count,             /* IN    : buffer size               */
+                             MPI_Datatype datatype, /* IN    : datatype of entry address */
+                             int root,              /* IN    : root process (sender)     */
+                             MPI_Comm communicator) /* IN    : communicator              */
+{
+  int rank, size, tag;
+  MPI_Status status;
+  MPI_Comm_rank(communicator, rank);
+  MPI_Comm_size(communicator, size);
+
+  //initialise tag variable
+
+  int neighboor_lh, neighboor_rh;
+  neighboor_rh = (rank + 1) % size;
+  neighboor_lh = (rank - 1) % size;
+  if (rank == root) { //Root process sends to neighboors
+    MPI_Send(buffer, count, datatype, neighboor_lh, tag, communicator);
+    MPI_Send(buffer, count, datatype, neighboor_rh, tag, communicator);
+  }
+  else if (rank < size/2){ // Circularly increasing MPI ranks
+    MPI_Recv(buffer, count, datatype, neighboor_lh, tag, communicator, &status);
+    // Send message to the neighboor that has bigger MPI rank
+    MPI_Send(buffer, count, datatype, neighboor_rh, tag, communicator);
+  }
+  else if (rank > size/2){  // Circularly decreasing MPI ranks
+    MPI_Recv(buffer, count, datatype, neighboor_rh, tag, communicator, &status);
+    // Send message to the neighboor that has smaller MPI rank
+    MPI_Send(buffer, count, datatype, neighboor_lh, tag, communicator);
+  }
+  else{ // Last nodes in the ring to reach
+
+    /*
+      By default, last node receive the message from the neighboor on its right
+      in both cases size is even (one more node to reach) or odd (two nodes
+      remaining)
+    */
+
+    MPI_Recv(buffer, count, datatype, neighboor_rh, tag, communicator, &status);
+  }
+
+  return 0;
+}
+\end{verbatim}
+
+\end{document}

@@ -44,7 +44,7 @@ In Figure~\ref{fig:montecarlo}, each partecipant is represented by one class. In
 \section{Exercise 3}
 
 %Sketch in pseudocode (https://en.wikipedia.org/wiki/Pseudocode) what you think the programs look like: the master and the worker.
-Algorithm~\ref{alg:master} explains how the program for the master looks like. Basically, the master divides the number of points by the number of worker - thus $N'$ - to distribute equally the task among the worker (obviously, if $N$ is not a multiple of $W$ there will be a worker with more points to compute). This suddivision is implicitly done with \texttt{OpenMP} or \texttt{MPI}. Each worker, illustrated with Algorithm~\ref{alg:worker}, computes the number of points $M'$ contained in the circle of radius $R$. This part is executed parallely among all worker. Finally, the number of points inside the circle is calculated by the number as the sum of all the values provided by the workers and consequently we can compute an approximation of $\pi$.
+Algorithm~\ref{alg:master} explains how the program for the master looks like. Basically, the master divides the number of points by the number of worker - thus $N'$ - to distribute equally the task among the worker (obviously, if $N$ is not a multiple of $W$ there will be a worker with more points to compute). This suddivision is implicitly done with \texttt{OpenMP} or \texttt{MPI}. Each worker, illustrated with Algorithm~\ref{alg:worker}, computes the number of points $M'$ contained in the circle of radius $R$. This part is executed parallely among all worker. Consequently, the number of points inside the circle is calculated as the sum of all the values provided by the workers and, finally, we can compute an approximation of $\pi$.
 
 \begin{algorithm}[htbp]
 %\SetAlgoNoLine
@@ -78,7 +78,7 @@ $M' \leftarrow 0$\;
 
 \section{Exercise 4}
 
-Firstly, we need to create the virtual machine representing the master. We can use the template from the \texttt{MPI} extra exercise, tweaking the values for this problem (e.g., reducing the number of cores to 1 and making the image non-persistent). Once the master has been created, we need to configure it for SSH communication and also with the \texttt{makeme\_master.sh} script. Secondly, we need to create one virtual machine for each worker. We can re-use the \texttt{MPI} template. For each worker node, we need to set a password and to configure it using the \texttt{makeme\_worker.sh} script, in order to indicate to the node who is the master.
+Firstly, we need to create the virtual machine representing the master. We can use the template from the \texttt{MPI} extra exercise, tweaking the values for this problem (e.g., reducing the number of cores to 1 and making the image non-persistent). Once the master has been created, we need to configure it for SSH communication and also with the \texttt{makeme\_master.sh} script. Secondly, we need to create one virtual machine for each worker. Even in this case, we can re-use the \texttt{MPI} template. For each worker node, we need to set a password and to configure it using the \texttt{makeme\_worker.sh} script, in order to indicate to the node who is the master.
 
 \section{Exercise 5}
 
@@ -87,13 +87,13 @@ Firstly, we need to create the virtual machine representing the master. We can u
 \subsection{Extra components}
 
 %a) What extra components from the HPC Cloud do you need to let the master create the workers?
-In order to provide the possibility for the master to create the workers, we need to integrate the \texttt{XML-RPC} API in our project. This allow us to programmatically create/deploy/terminate virtual machines.
+In order to provide the possibility for the master to create the workers, we need to integrate the \texttt{XML-RPC} API in our project. This allow us to create/deploy/terminate \textbf{programmatically} virtual machines.
 
 \subsection{Pseudocode}
 
 %b) Do the same as in exercise 3: write pseudocode for what the master looks like. Does the worker change? Think of releasing resources when the computation is finished!
 
-In Algorithm~\ref{alg:master_2} we can see how the pseudocode for the master changed. In fact, now the master has the responsability to allocate and deallocate virtual machines corresponding to the workers. However, in this way we have a more efficient consumption of resource: once a worker completed its task, we can release the resource that otherwise would be held until we release them throught the UI.
+In Algorithm~\ref{alg:master_2} we can see how the pseudocode for the master changes. In fact, now the master has the responsability to allocate and deallocate virtual machines corresponding to the workers. However, in this way we have a more efficient consumption of resource: once a worker complete its task, we can release the resources that otherwise would be held until we release them throught the UI.
 
 \begin{algorithm}[htbp]
 %\SetAlgoNoLine
