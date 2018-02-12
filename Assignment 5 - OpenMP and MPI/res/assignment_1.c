@@ -91,7 +91,7 @@ void multimult(double *a, double *b, int len, int steps, int n_threads){
   double c;
 
   for (int t=0; t < steps; t++){
-      #pragma omp parallel for private(c) shared(a,b,len,steps,t) schedule(static)
+      #pragma omp parallel for private(c) shared(a,b,len,steps,t) schedule(static,len/n_threads)
       for (int i=0; i < len; i++){
           c = a [i] * b [i];
           a[i] = c * (double) t;
@@ -105,7 +105,7 @@ int main(){
   int step_iters = 10;    // number of iterations for the step variable
   int delta_steps = 10;   // delta at each iterations for the step variable
   int len_iters = 10;     // number of iterations for the length variable
-  int delta_len = 10000;  // delta at each iterations for the length variable
+  int delta_len = 50000;  // delta at each iterations for the length variable
   int thread_iters = 5;   // number of iterations for the threads variable
 
   // variable used to store the time of each iteration

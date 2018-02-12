@@ -4,6 +4,8 @@
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
 \usepackage{listings}
 \usepackage{algorithmic}
 \usepackage[ruled]{algorithm2e} % For algorithms
@@ -24,7 +26,7 @@
 
 \section{Experimenting with OpenMP}
 
-One of the main advantages of OpenMP is that it is not strictly necessary to change the source code to parallelise the program. In fact, we can improve the performances adding pragrams. Taking a look at the \texttt{multimult} function in Section~\ref{subsec:ausiliary}, we can see that the logic of the program is the same of the \texttt{multimult\_seq} function, which is the sequential version. We used the following macros to make the inner \texttt{for} loop parallel: \texttt{pragma omp parallel}, \texttt{private}, \texttt{shared} and \texttt{schedule}. By using \texttt{pragma omp parallel}, we are saying that different iterations of the loop can be executed in different threads. The \texttt{private} and \texttt{shared} macros define which are the variables shared among the different threads and which ones are not. In our case, the only private variable is \texttt{c}, which is used to temporarly store the value of the vector product between \texttt{a} and \texttt{b}. Finally, with the \texttt{schedule} macro we explicitly say in which order the different threads have to be executed; \texttt{static} means that the order is decided a priori of the execution, while the variable the second parameter for the \texttt{schedule} macro indicates the chunk size. Through different runs, we found out that the best results are obtained without explicitly specifing the chunk size.
+One of the main advantages of OpenMP is that it is not strictly necessary to change the source code to parallelise the program. In fact, we can improve the performances adding pragrams. Taking a look at the \texttt{multimult} function in Section~\ref{subsec:ausiliary}, we can see that the logic of the program is the same of the \texttt{multimult\_seq} function, which is the sequential version. We used the following macros to make the inner \texttt{for} loop parallel: \texttt{pragma omp parallel}, \texttt{private}, \texttt{shared} and \texttt{schedule}. By using \texttt{pragma omp parallel}, we are saying that different iterations of the loop can be executed in different threads. The \texttt{private} and \texttt{shared} macros define which are the variables shared among the different threads and which ones are not. In our case, the only private variable is \texttt{c}, which is used to temporarly store the value of the vector product between \texttt{a} and \texttt{b}. Finally, with the \texttt{schedule} macro we explicitly say in which order the different threads have to be executed; \texttt{static} means that the order is decided a priori of the execution, while the variable the second parameter for the \texttt{schedule} macro indicates the chunk size. Through different runs, we found out that the best results are obtained with $size_{chunk} = \dfrac{size_{array}}{n_{threads}}$.
 
 One further improvement might be parallelising the external \texttt{for} loop, however this is not feasible without modifying the code because for each different iteration of this loop, the value of \texttt{a[i]} depends on the previous iterations. However, by switching the inner loop with the outermost one, we could make both of them run in parallel.
 
@@ -119,12 +121,12 @@ void multimult_seq(double *a, double *b, int len, int steps){
   Parallel version of the multimult function
 */
 
-void multimult(double *a, double *b, int len, int steps){
+void multimult(double *a, double *b, int len, int steps, int n_threads){
   double c;
 
   for (int t=0; t < steps; t++){
       #pragma omp parallel for private(c) shared(a,b,len,steps,t) \
-      schedule(static)
+      schedule(static, len/n_threads)
       for (int i=0; i < len; i++){
           c = a [i] * b [i];
           a[i] = c * (double) t;
@@ -141,7 +143,7 @@ int main(){
   int step_iters = 10;    // number of iterations for the step variable
   int delta_steps = 10;   // delta at each iterations for the step variable
   int len_iters = 10;     // number of iterations for the length variable
-  int delta_len = 10000;  // delta at each iterations for the length variable
+  int delta_len = 50000;  // delta at each iterations for the length variable
   int thread_iters = 5;   // number of iterations for the threads variable
 
   // variable used to store the time of each iteration
@@ -218,10 +220,114 @@ int main(){
 }
 \end{verbatim}
 
+\newpage
+
 \subsection{Results}
 
 %Specify characteristics of the processor
+In this section, we describe the results obtained from different simulation runs on both laptop and Cartesius supercomputer. The computer on which the tests are executed is equipped with \texttt{Intel Core i7-3630QM CPU @ 2.40GHz x 8} processor, which means that it can run up to 8 threads simultaneously (4 physical processors and 8 virtual ones). In the following graphs, we use a logarithmic scale for the execution time in order to improve the readibility.
 
+In Figure~\ref{fig:seq}, we can see how the number of elements in the array and the number of steps affect the execution time. There is a clear positive correlation between these two factor and the time required from the program to terminate. Moreover, we can see how the results on the local machine are more chaotic (i.e., with a less linear behaviour) than the ones obtained from Cartesius. We suppose this is due to interference of other processes during the simulation on the normal computer.
+
+We can see how there is no significative difference between using the array length or the number of steps as abscissa. Consequently, from now on, we will always consider as x-axis the number of steps. In this way, we should get an indication of how much the parallelisation is improving the performance by looking at the distance between the different lines - i.e., how much the time is increasing with different vectors length.  
+
+\begin{figure}[htbp]
+\centering
+\begin{subfigure}{.45\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{res/seq/array_length_res_seq.png}
+  \caption{Run on local machine}
+  \label{subfig:length_seq}
+\end{subfigure}%
+\begin{subfigure}{.45\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{res/seq/array_length_res_seq_cartesius.png}
+  \caption{Run on Cartesius}
+  \label{subfig:length_seq_cart}
+\end{subfigure}
+\begin{subfigure}{.45\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{res/seq/array_steps_res_seq.png}
+  \caption{Run on local machine}
+  \label{subfig:steps_seq}
+\end{subfigure}%
+\begin{subfigure}{.45\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{res/seq/array_steps_res_seq_cartesius.png}
+  \caption{Run on Cartesius}
+  \label{subfig:steps_seq_cart}
+\end{subfigure}
+\caption{Correlation between array length, number of steps and execution time - sequential version}
+\label{fig:seq}
+\end{figure}
+
+Secondly, we want to verify that there is an improvement in the performance of the program when we increase the number of threads. However, this enhancement has an upper bound dictated by the number of cores of the machine. For example, we can see that on a machine with 8 cores, it is better to use 8 threads (Figure~\ref{subfig:steps_thread2_parall}) instead of 16 (Figure~\ref{subfig:steps_thread16_parall}).
+
+In general, we can assert that the number of threads decreases the execution time of our program. We can see how in Figure~\ref{subfig:steps_thread2_parall_cart}, \ref{subfig:steps_thread4_parall_cart}, \ref{subfig:steps_thread8_parall_cart} and \ref{subfig:steps_thread16_parall_cart} the lines indicating the execution time are getting lower and closer, indicating respectively a reduction of the required time and the improvement provided from the parallelisation to bigger arrays. Moreover, as for the sequential version, even in this case the behaviour on the local machine is not as much linear as on the supercomputer.
+
+
+\begin{figure}[htbp]
+\centering
+\begin{subfigure}{.42\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{res/parallel/array_thread_2_steps_res.png}
+  \caption{Local machine - 2 threads}
+  \label{subfig:steps_thread2_parall}
+\end{subfigure}%
+\begin{subfigure}{.42\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{res/parallel/array_thread_2_steps_res_cartesius.png}
+  \caption{Cartesius - 2 threads}
+  \label{subfig:steps_thread2_parall_cart}
+\end{subfigure}
+\begin{subfigure}{.42\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{res/parallel/array_thread_4_steps_res.png}
+  \caption{Local machine - 4 threads}
+  \label{subfig:steps_thread4_parall}
+\end{subfigure}%
+\begin{subfigure}{.42\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{res/parallel/array_thread_4_steps_res_cartesius.png}
+  \caption{Cartesius - 4 threads}
+  \label{subfig:steps_thread4_parall_cart}
+\end{subfigure}
+\begin{subfigure}{.42\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{res/parallel/array_thread_8_steps_res.png}
+  \caption{Local machine - 8 threads}
+  \label{subfig:steps_thread8_parall}
+\end{subfigure}%
+\begin{subfigure}{.42\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{res/parallel/array_thread_8_steps_res_cartesius.png}
+  \caption{Cartesius - 8 threads}
+  \label{subfig:steps_thread8_parall_cart}
+\end{subfigure}
+\begin{subfigure}{.42\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{res/parallel/array_thread_16_steps_res.png}
+  \caption{Local machine - 16 threads}
+  \label{subfig:steps_thread16_parall}
+\end{subfigure}%
+\begin{subfigure}{.42\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{res/parallel/array_thread_16_steps_res_cartesius.png}
+  \caption{Cartesius - 32 threads}
+  \label{subfig:steps_thread16_parall_cart}
+\end{subfigure}
+\caption{Correlation between number of threads and execution time - parallel version}
+\label{fig:steps_parall}
+\end{figure}
+
+Furthermore, in order to verify the upper bound previously defined, we executed one more simulation using 32 threads, knowing that the machine in Cartesius on which is executed has 16 cores. As a result, comparing Figure~\ref{subfig:steps_thread16_parall_cart} and Figure~\ref{fig:steps_thread32_parall_cart} it is evident that the execution time increases due to the overhead created by generating a number of threads greater than the number of cores.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.7\textwidth]{res/parallel/array_thread_32_steps_res_cartesius.png}
+\caption{Execution of the program with 32 threads on the Cartesius supercomputer}
+\label{fig:steps_thread32_parall_cart}
+\end{figure}
 \newpage
 
 \section{Collective communication}
