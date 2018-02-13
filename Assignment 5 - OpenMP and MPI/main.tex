@@ -26,11 +26,11 @@
 
 \section{Experimenting with OpenMP}
 
-One of the main advantages of OpenMP is that it is not strictly necessary to change the source code to parallelise the program. In fact, we can improve the performances adding pragrams. Taking a look at the \texttt{multimult} function in Section~\ref{subsec:ausiliary}, we can see that the logic of the program is the same of the \texttt{multimult\_seq} function, which is the sequential version. We used the following macros to make the inner \texttt{for} loop parallel: \texttt{pragma omp parallel}, \texttt{private}, \texttt{shared} and \texttt{schedule}. By using \texttt{pragma omp parallel}, we are saying that different iterations of the loop can be executed in different threads. The \texttt{private} and \texttt{shared} macros define which are the variables shared among the different threads and which ones are not. In our case, the only private variable is \texttt{c}, which is used to temporarly store the value of the vector product between \texttt{a} and \texttt{b}. Finally, with the \texttt{schedule} macro we explicitly say in which order the different threads have to be executed; \texttt{static} means that the order is decided a priori of the execution, while the variable the second parameter for the \texttt{schedule} macro indicates the chunk size. Through different runs, we found out that the best results are obtained with $size_{chunk} = \dfrac{size_{array}}{n_{threads}}$.
+One of the main advantages of OpenMP is that it is not strictly necessary to change the source code to parallelize the program. In fact, we can improve the performances adding pragrams. Taking a look at the \texttt{multimult} function in Section~\ref{subsec:ausiliary}, we can see that the logic of the program is the same of the \texttt{multimult\_seq} function, which is the sequential version. We used the following macros to make the inner \texttt{for} loop parallel: \texttt{pragma omp parallel}, \texttt{private}, \texttt{shared} and \texttt{schedule}. By using \texttt{pragma omp parallel}, we are saying that different iterations of the loop can be executed in different threads. The \texttt{private} and \texttt{shared} macros define which are the variables shared among the different threads and which ones are not. In our case, the only private variable is \texttt{c}, which is used to temporarily store the value of the vector product between \texttt{a} and \texttt{b}. Finally, with the \texttt{schedule} macro we explicitly say in which order the different threads have to be executed; \texttt{static} means that the order is decided a priori of the execution, while the second parameter for the \texttt{schedule} macro indicates the chunk size. Through different runs, we found out that the best results are obtained with $size_{chunk} = \dfrac{size_{array}}{n_{threads}}$.
 
-One further improvement might be parallelising the external \texttt{for} loop, however this is not feasible without modifying the code because for each different iteration of this loop, the value of \texttt{a[i]} depends on the previous iterations. However, by switching the inner loop with the outermost one, we could make both of them run in parallel.
+One further improvement might be parallelizing the external \texttt{for} loop, however this is not feasible without modifying the code because for each different iteration of this loop, the value of \texttt{a[i]} depends on the previous iterations. However, by switching the inner loop with the outermost one, we could make both of them run in parallel.
 
-\subsection{Ausiliary functions}\label{subsec:ausiliary}
+\subsection{Auxiliary functions}\label{subsec:ausiliary}
 
 \begin{verbatim}
 #include <stdio.h>
@@ -225,11 +225,11 @@ int main(){
 \subsection{Results}
 
 %Specify characteristics of the processor
-In this section, we describe the results obtained from different simulation runs on both laptop and Cartesius supercomputer. The computer on which the tests are executed is equipped with \texttt{Intel Core i7-3630QM CPU @ 2.40GHz x 8} processor, which means that it can run up to 8 threads simultaneously (4 physical processors and 8 virtual ones). In the following graphs, we use a logarithmic scale for the execution time in order to improve the readibility.
+In this section, we describe the results obtained from different simulation runs on both laptop and Cartesius supercomputer. The computer on which the tests are executed is equipped with \texttt{Intel Core i7-3630QM CPU @ 2.40GHz x 8} processor, which means that it can run up to 8 threads simultaneously (4 physical processors and 8 virtual ones). In the following graphs, we use a logarithmic scale for the execution time in order to improve the readability.
 
 In Figure~\ref{fig:seq}, we can see how the number of elements in the array and the number of steps affect the execution time. There is a clear positive correlation between these two factor and the time required from the program to terminate. Moreover, we can see how the results on the local machine are more chaotic (i.e., with a less linear behaviour) than the ones obtained from Cartesius. We suppose this is due to interference of other processes during the simulation on the normal computer.
 
-We can see how there is no significative difference between using the array length or the number of steps as abscissa. Consequently, from now on, we will always consider as x-axis the number of steps. In this way, we should get an indication of how much the parallelisation is improving the performance by looking at the distance between the different lines - i.e., how much the time is increasing with different vectors length.  
+Furthermore, there is no significant difference between using the array length or the number of steps as abscissa. Consequently, from now on, we will always consider as x-axis the number of steps. In this way, we should get an indication of how much the parallelization is improving the performance by looking at the distance between the different lines - i.e., how much the time is increasing with different vectors length.  
 
 \begin{figure}[htbp]
 \centering
@@ -261,9 +261,9 @@ We can see how there is no significative difference between using the array leng
 \label{fig:seq}
 \end{figure}
 
-Secondly, we want to verify that there is an improvement in the performance of the program when we increase the number of threads. However, this enhancement has an upper bound dictated by the number of cores of the machine. For example, we can see that on a machine with 8 cores, it is better to use 8 threads (Figure~\ref{subfig:steps_thread2_parall}) instead of 16 (Figure~\ref{subfig:steps_thread16_parall}).
+Secondly, we want to verify that there is an improvement in the performance of the program when we increase the number of threads. In general, we can assert that the number of threads decreases the execution time of our program. However, this enhancement has an upper bound dictated by the number of cores of the machine. For example, we can see that on a machine with 8 cores, it is better to use 8 threads (Figure~\ref{subfig:steps_thread2_parall}) instead of 16 (Figure~\ref{subfig:steps_thread16_parall}).
 
-In general, we can assert that the number of threads decreases the execution time of our program. We can see how in Figure~\ref{subfig:steps_thread2_parall_cart}, \ref{subfig:steps_thread4_parall_cart}, \ref{subfig:steps_thread8_parall_cart} and \ref{subfig:steps_thread16_parall_cart} the lines indicating the execution time are getting lower and closer, indicating respectively a reduction of the required time and the improvement provided from the parallelisation to bigger arrays. Moreover, as for the sequential version, even in this case the behaviour on the local machine is not as much linear as on the supercomputer.
+We can see how - in Figure~\ref{subfig:steps_thread2_parall_cart}, \ref{subfig:steps_thread4_parall_cart}, \ref{subfig:steps_thread8_parall_cart} and \ref{subfig:steps_thread16_parall_cart} - the lines indicating the execution time are getting lower and closer, indicating respectively a reduction of the time required and the improvement provided from the parallelization to bigger arrays. Moreover, as for the sequential version, even in this case the behaviour on the local machine is not as much linear as on the supercomputer.
 
 
 \begin{figure}[htbp]
@@ -320,7 +320,7 @@ In general, we can assert that the number of threads decreases the execution tim
 \label{fig:steps_parall}
 \end{figure}
 
-Furthermore, in order to verify the upper bound previously defined, we executed one more simulation using 32 threads, knowing that the machine in Cartesius on which is executed has 16 cores. As a result, comparing Figure~\ref{subfig:steps_thread16_parall_cart} and Figure~\ref{fig:steps_thread32_parall_cart} it is evident that the execution time increases due to the overhead created by generating a number of threads greater than the number of cores.
+Finally, in order to verify the upper bound previously defined, we execute one more simulation using 32 threads, knowing that the machine in Cartesius on which is executed has 16 cores. As a result, comparing Figure~\ref{subfig:steps_thread16_parall_cart} and Figure~\ref{fig:steps_thread32_parall_cart}, it is evident that the execution time increases due to the overhead created by generating a number of threads greater than the number of cores.
 
 \begin{figure}[htbp]
 \centering
@@ -332,7 +332,7 @@ Furthermore, in order to verify the upper bound previously defined, we executed 
 
 \section{Collective communication}
 
-In order to implement the collective communication, we can use the \texttt{MPI\_Send} and \texttt{MPI\_Recv} methods, First of all, we need to retrieve the communication \texttt{rank} and \texttt{size} (i.e., current process id and number of process respectively). To do so, we use the \texttt{MPI\_Comm\_rank} and \texttt{MPI\_Comm\_size} methods. Finally, if the current process is the root one, we broadcast the message to all the other process with the \texttt{MPI\_Send} method; otherwise, the current process is one of the receivers, so we start to listen awating for a message from the root process. The \texttt{tag} variable is used to filter messages from different process.
+In order to implement the collective communication, we can use the \texttt{MPI\_Send} and \texttt{MPI\_Recv} methods, First of all, we need to retrieve the communication \texttt{rank} and \texttt{size} (i.e., current process id and number of process respectively). To do so, we use the \texttt{MPI\_Comm\_rank} and \texttt{MPI\_Comm\_size} methods. Finally, if the current process is the root one, we broadcast the message to all the other process with the \texttt{MPI\_Send} method; otherwise, the current process is one of the receivers, so we start to listen awaiting for a message from the root process. The \texttt{tag} variable is used to filter messages from different process.
 
 \begin{verbatim}
 int MPI_Broadcast(  void *buffer,           /* INOUT : buffer address            */
@@ -367,7 +367,7 @@ int MPI_Broadcast(  void *buffer,           /* INOUT : buffer address           
 
 \section{Collective communication with topology adaptation}
 
-Topology adaptation improved the performance of the broadcast communication, delegating the re-trasmission of the signal to other nodes. In the case of 1-dimensional ring topology, each node communicates with only two different nodes, one that has a greater MPI rank and one that has a smaller MPI rank than the node itself. Consequently, the root node send the message to its two neighboors, which propagates the message throught the ring without sending it back. In the end, there might be one or two nodes that are the last ones to receive the message, depending on the number of node of the network - i.e., if the number is even, there is one final node; otherwise, there are two.
+Topology adaptation improves the performance of the broadcast communication, delegating the re-trasmission of the signal to other nodes. In the case of 1-dimensional ring topology, each node communicates with only two different nodes, one that has a greater MPI rank and one that has a smaller MPI rank than the node itself. Consequently, the root node send the message to its two neighboors, which propagates the message throught the ring without sending it back. In the end, there might be one or two nodes that are the last ones to receive the message, depending on the number of node of the network - i.e., if the number is even, there is one final node; otherwise, there are two.
 
 If we assume $N$ is the number of nodes in the ring, there will be $N-1$ communication events (while without topology adaptation we would have $N$ events). However, since the broadcasting operation is distributed amoung the nodes, the time required to complete the broadcast is much smaller. If we consider as $k$ the time for a single \texttt{MPI\_Send} operation, without topology adaptation we need $kN$ time units to complete the broadcasting, but with this new feature the time is reduced to $k \cdot \floor*{\frac{N}{2}}$.
 
